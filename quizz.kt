@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.qcm0.ui.theme.Qcm0Theme
+import androidx.compose.ui.Alignment
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,19 +65,26 @@ fun MainScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun WelcomeScreen(onNameEntered: (String) -> Unit) {
-    var nameInput by remember { mutableStateOf("") } // Correction ici
+    var nameInput by remember { mutableStateOf("") }
 
     // Layout d'accueil
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp)
-    ) {
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = "Entrez votre nom:")
         TextField(
             value = nameInput,
             onValueChange = { nameInput = it },
-            label = { Text("Nom") } // Ajout d'un label pour le champ
+            label = { Text("Nom") }
         )
-        Button(onClick = { onNameEntered(nameInput) }) {
+        Button(
+            onClick = { onNameEntered(nameInput) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF6200EE), // Couleur de fond du bouton
+                contentColor = Color.White // Couleur du texte du bouton
+            )
+        ) {
             Text(text = "Commencer")
         }
     }
@@ -82,10 +92,20 @@ fun WelcomeScreen(onNameEntered: (String) -> Unit) {
 
 @Composable
 fun QuestionScreen(question: Question, onAnswerSelected: (Int) -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding(16.dp)) {
+    Column(modifier = modifier
+        .fillMaxSize()
+        .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = question.question)
         question.options.forEachIndexed { index, option ->
-            Button(onClick = { onAnswerSelected(index) }) {
+            Button(
+                onClick = { onAnswerSelected(index) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF03DAC5), // Couleur de fond du bouton
+                    contentColor = Color.White // Couleur du texte du bouton
+                )
+            ) {
                 Text(text = option)
             }
         }
@@ -94,11 +114,20 @@ fun QuestionScreen(question: Question, onAnswerSelected: (Int) -> Unit, modifier
 
 @Composable
 fun ResultScreen(score: Int, totalQuestions: Int, modifier: Modifier = Modifier) {
-    Text(
-        text = "Vous avez obtenu ${score} sur $totalQuestions!",
-        modifier = modifier.padding(16.dp)
-    )
+    Column(
+        modifier = modifier
+            .padding(16.dp)
+            .fillMaxSize(), // Remplit tout l'espace disponible
+        verticalArrangement = Arrangement.Center, // Centre verticalement
+        horizontalAlignment = Alignment.CenterHorizontally // Centre horizontalement
+    ) {
+        Text(
+            text = "Vous avez obtenu ${score} sur $totalQuestions!",
+            modifier = Modifier.padding(16.dp) // Ajoute un espacement autour du texte
+        )
+    }
 }
+
 
 // Modèle de question
 data class Question(
