@@ -4,16 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.qcm0.ui.theme.Qcm0Theme
-import androidx.compose.ui.Alignment
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,9 +70,12 @@ fun WelcomeScreen(onNameEntered: (String) -> Unit) {
 
     // Layout d'accueil
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally) {
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(text = "Entrez votre nom:")
         TextField(
             value = nameInput,
@@ -92,11 +96,13 @@ fun WelcomeScreen(onNameEntered: (String) -> Unit) {
 
 @Composable
 fun QuestionScreen(question: Question, onAnswerSelected: (Int) -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier = modifier
-        .fillMaxSize()
-        .padding(16.dp),
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally) {
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(text = question.question)
         question.options.forEachIndexed { index, option ->
             Button(
@@ -125,8 +131,39 @@ fun ResultScreen(score: Int, totalQuestions: Int, modifier: Modifier = Modifier)
             text = "Vous avez obtenu ${score} sur $totalQuestions!",
             modifier = Modifier.padding(16.dp) // Ajoute un espacement autour du texte
         )
+        Spacer(modifier = Modifier.height(16.dp)) // Espace entre le texte et le graphique
+        ScorePieChart(score, totalQuestions) // Appel au graphique
     }
 }
+
+@Composable
+fun ScorePieChart(score: Int, totalQuestions: Int, modifier: Modifier = Modifier) {
+    val correctPercentage = if (totalQuestions > 0) (score.toFloat() / totalQuestions.toFloat()) else 0f
+    val incorrectPercentage = 1f - correctPercentage
+
+    // Utilisation de Canvas pour dessiner le graphique
+    Canvas(modifier = modifier
+        .size(200.dp) // Taille du graphique
+        .padding(16.dp)) {
+
+        // Dessiner le segment pour les bonnes réponses
+        drawArc(
+            color = Color.Green, // Couleur pour les bonnes réponses
+            startAngle = 270f, // Commencer à 12h
+            sweepAngle = 360f * correctPercentage, // Angle proportionnel aux bonnes réponses
+            useCenter = true // Remplir le centre du cercle
+        )
+
+        // Dessiner le segment pour les mauvaises réponses
+        drawArc(
+            color = Color.Red, // Couleur pour les mauvaises réponses
+            startAngle = 270f + (360f * correctPercentage), // Commencer à la fin de l'arc précédent
+            sweepAngle = 360f * incorrectPercentage, // Angle proportionnel aux mauvaises réponses
+            useCenter = true // Remplir le centre du cercle
+        )
+    }
+}
+
 
 
 // Modèle de question
